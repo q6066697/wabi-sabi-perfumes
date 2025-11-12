@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - Wabi-Sabi Perfumes</title>
+    <meta name="description" content="Discover the philosophy behind our fragrances through the ancient wisdom of Wabi-Sabi.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --off-white: #F8F6F0;
+            --muted-grey: #A8A5A0;
+            --deep-green: #4A5D4A;
+            --ochre: #B8A082;
+            --warm-beige: #E8E0D0;
+            --charcoal: #2C2C2C;
+            --soft-sage: #7A8B7A;
+            --dusty-rose: #C4A5A0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--off-white);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        /* Story Sections */
+        .story-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .story-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        .cracked-beauty .story-background {
+            background-image: url('resources/cracked-bowl.jpg');
+        }
+
+        .tea-meditation .story-background {
+            background-image: url('resources/tea-ritual.jpg');
+        }
+
+        .falling-leaves .story-background {
+            background-image: url('resources/ginkgo-leaves.jpg');
+        }
+
+        .golden-repair .story-background {
+            background: linear-gradient(135deg, var(--warm-beige) 0%, var(--off-white) 100%);
+        }
+
+        .story-content {
+            position: relative;
+            z-index: 2;
+            max-width: 90%;
+            background: rgba(248, 246, 240, 0.9);
+            padding: 2.5rem;
+            border-radius: 2px;
+            backdrop-filter: blur(15px);
+        }
+
+        .story-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 400;
+            color: var(--deep-green);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .story-text {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--charcoal);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .story-quote {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+            color: var(--deep-green);
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .story-author {
+            font-size: 0.9rem;
+            color: var(--muted-grey);
+            margin-bottom: 2rem;
+        }
+
+        /* Crack Animation */
+        .crack-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 2rem auto;
+        }
+
+        .crack-line {
+            stroke: var(--ochre);
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+        }
+
+        /* Steam Animation */
+        .steam-wisps {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 100px;
+            opacity: 0;
+        }
+
+        .steam-wisp {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, rgba(168, 165, 160, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        /* Falling Leaves Animation */
+        .leaves-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .falling-leaf {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            background: var(--ochre);
+            border-radius: 0 100% 0 100%;
+            opacity: 0.7;
+            top: -50px;
+        }
+
+        /* Golden Repair Section */
+        .golden-repair {
+            background: linear-gradient(135deg, var(--warm-beige) 0%, var(--off-white) 100%);
+        }
+
+        .repair-visual {
+            width: 150px;
+            height: 150px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .golden-circle {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--ochre);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .golden-line {
+            position: absolute;
+            width: 80%;
+            height: 3px;
+            background: var(--ochre);
+            transform-origin: center;
+        }
+
+        .golden-line:nth-child(1) { transform: rotate(0deg); }
+        .golden-line:nth-child(2) { transform: rotate(45deg); }
+        .golden-line:nth-child(3) { transform: rotate(90deg); }
+        .golden-line:nth-child(4) { transform: rotate(135deg); }
+
+        /* Navigation */
+        .nav-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(168, 165, 160, 0.8);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(74, 93, 74, 0.9);
+            transform: scale(1.1);
+        }
+
+        .nav-toggle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 2px;
+            background: var(--off-white);
+            box-shadow: 0 6px 0 var(--off-white), 0 -6px 0 var(--off-white);
+        }
+
+        .nav-menu {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(248, 246, 240, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2px;
+            padding: 1rem 0;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .nav-menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--deep-green);
+            text-decoration: none;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(168, 165, 160, 0.2);
+        }
+
+        .nav-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(184, 160, 130, 0.2);
+            color: var(--charcoal);
+        }
+
+        /* Ink Wash Blur Effect */
+        .ink-wash-blur {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(248, 246, 240, 0.3) 70%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .story-section {
+                padding: 1rem;
+            }
+            
+            .story-content {
+                padding: 1.5rem;
+            }
+            
+            .nav-toggle {
+                bottom: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .nav-menu {
+                bottom: 5rem;
+                right: 1rem;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .nav-toggle:focus {
+            outline: 2px solid var(--deep-green);
+            outline-offset: 2px;
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Cracked Beauty Section -->
+    <section class="story-section cracked-beauty animate-on-scroll" data-animation="crack-grow">
+        <div class="story-background"></div>
+        <div class="ink-wash-blur"></div>
+        
+        <div class="story-content">
+            <h2 class="story-title">Cracked Beauty</h2>
+            <p class="story-text">
+                In the ancient art of Kintsugi, broken pottery is repaired with gold, transforming damage into beauty. 
+                The cracks become part of the object's history, telling a story of resilience and renewal.
+            </p>
+            <div class="story-quote">
+                "The world breaks everyone and afterward many are strong at the broken places."
+            </div>
+            <div class="story-author">— Ernest Hemingway</div>
+            
+            <div class="crack-container">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <path class="crack-line" d="M50,50 Q100,30 150,50 Q180,70 170,120 Q160,160 100,150 Q50,140 40,100 Z" />
+                    <path class="crack-line" d="M80,80 Q120,60 140,90 Q160,110 130,140" />
+                    <path class="crack-line" d="M60,120 Q90,100 110,130 Q130,150 100,170" />
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tea Meditation Section -->
+    <section class="story-section tea-meditation animate-on-scroll" data-animation="steam-rise">
+        <div class="story-background"></div>
+        <div class="ink-wash-blur"></div>
+        <div class="steam-wisps">
+            <div class="steam-wisp" style="left: 20%; animation-delay: 0s;"></div>
+            <div class="steam-wisp" style="left: 50%; animation-delay: 1s;"></div>
+            <div class="steam-wisp" style="left: 80%; animation-delay: 2s;"></div>
+        </div>
+        
+        <div class="story-content">
+            <h2 class="story-title">Tea Meditation</h2>
+            <p class="story-text">
+                The Japanese tea ceremony embodies the philosophy of slowing down time. Each movement is deliberate, 
+                each breath measured, creating space for contemplation in the steam that rises from simple ceramic bowls.
+            </p>
+            <div class="story-quote">
+                "In the stillness between sips, we find the universe."
+            </div>
+            <div class="story-author">— Tea Master Sen no Rikyū</div>
+        </div>
+    </section>
+
+    <!-- Falling Leaves Section -->
+    <section class="story-section falling-leaves animate-on-scroll" data-animation="leaves-fall">
+        <div class="story-background"></div>
+        <div class="ink-wash-blur"></div>
+        <div class="leaves-container">
+            <div class="falling-leaf" style="left: 10%; animation-delay: 0s;"></div>
+            <div class="falling-leaf" style="left: 30%; animation-delay: 2s;"></div>
+            <div class="falling-leaf" style="left: 50%; animation-delay: 4s;"></div>
+            <div class="falling-leaf" style="left: 70%; animation-delay: 1s;"></div>
+            <div class="falling-leaf" style="left: 90%; animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="story-content">
+            <h2 class="story-title">Falling Leaves</h2>
+            <p class="story-text">
+                Ginkgo leaves fall in golden spirals, each one a testament to the beauty of aging and change. 
+                They remind us that nothing in this world is permanent, and in that impermanence lies profound beauty.
+            </p>
+            <div class="story-quote">
+                "To find beauty in the withered and broken is to understand life's deepest truth."
+            </div>
+            <div class="story-author">— Zen Proverb</div>
+        </div>
+    </section>
+
+    <!-- Golden Repair Section -->
+    <section class="story-section golden-repair animate-on-scroll" data-animation="fade-up">
+        <div class="story-content">
+            <h2 class="story-title">Golden Repair</h2>
+            <p class="story-text">
+                Our fragrances are inspired by the philosophy of Kintsugi—finding strength and beauty in what has been broken. 
+                Each scent tells a story of transformation, where imperfection becomes the source of unique character.
+            </p>
+            <div class="story-quote">
+                "Your cracks are where the light enters you."
+            </div>
+            <div class="story-author">— Rumi</div>
+            
+            <div class="repair-visual">
+                <div class="golden-circle">
+                    <div class="golden-line"></div>
+                    <div class="golden-line"></div>
+                    <div class="golden-line"></div>
+                    <div class="golden-line"></div>
+                </div>
+            </div>
+            
+            <p class="story-text">
+                <a href="lifestyle.html" style="color: var(--deep-green); text-decoration: none; border-bottom: 1px solid var(--deep-green);">
+                    Discover the atmosphere →
+                </a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <nav class="nav-menu">
+        <a href="index.html">Fragrances</a>
+        <a href="story.html">Story</a>
+        <a href="lifestyle.html">Atmosphere</a>
+    </nav>
+
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+    
+    <script>
+        // Additional story-specific animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate steam wisps
+            const steamWisps = document.querySelectorAll('.steam-wisp');
+            steamWisps.forEach((wisp, index) => {
+                anime({
+                    targets: wisp,
+                    opacity: [0, 0.6, 0],
+                    translateY: [0, -30, -60],
+                    scale: [1, 1.2, 0.8],
+                    duration: 4000,
+                    delay: index * 1000,
+                    loop: true,
+                    easing: 'easeInOutSine'
+                });
+            });
+
+            // Animate falling leaves
+            const leaves = document.querySelectorAll('.falling-leaf');
+            leaves.forEach((leaf, index) => {
+                anime({
+                    targets: leaf,
+                    translateY: [-50, window.innerHeight + 50],
+                    translateX: [0, Math.random() * 100 - 50],
+                    rotate: [0, 360 * (Math.random() * 2 + 1)],
+                    duration: 8000 + Math.random() * 4000,
+                    delay: index * 2000,
+                    loop: true,
+                    easing: 'easeInOutSine'
+                });
+            });
+
+            // Animate golden repair lines
+            const goldenLines = document.querySelectorAll('.golden-line');
+            goldenLines.forEach((line, index) => {
+                anime({
+                    targets: line,
+                    opacity: [0, 1],
+                    scale: [0, 1],
+                    duration: 1000,
+                    delay: index * 200,
+                    easing: 'easeOutQuart'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

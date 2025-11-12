@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atmosphere - Wabi-Sabi Perfumes</title>
+    <meta name="description" content="Immerse yourself in the contemplative atmosphere of Wabi-Sabi through minimalist spaces and mindful moments.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --off-white: #F8F6F0;
+            --muted-grey: #A8A5A0;
+            --deep-green: #4A5D4A;
+            --ochre: #B8A082;
+            --warm-beige: #E8E0D0;
+            --charcoal: #2C2C2C;
+            --soft-sage: #7A8B7A;
+            --dusty-rose: #C4A5A0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--off-white);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        /* Atmosphere Sections */
+        .atmosphere-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .atmosphere-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .tatami-corner .atmosphere-background {
+            background-image: url('resources/tatami-corner.jpg');
+        }
+
+        .pottery-fissure .atmosphere-background {
+            background-image: url('resources/pottery-fissure.jpg');
+        }
+
+        .zen-garden .atmosphere-background {
+            background-image: url('resources/zen-garden.jpg');
+        }
+
+        .slow-time {
+            background: linear-gradient(135deg, var(--warm-beige) 0%, var(--off-white) 100%);
+        }
+
+        .atmosphere-content {
+            position: relative;
+            z-index: 2;
+            max-width: 90%;
+            background: rgba(248, 246, 240, 0.9);
+            padding: 2.5rem;
+            border-radius: 2px;
+            backdrop-filter: blur(15px);
+        }
+
+        .atmosphere-title {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 400;
+            color: var(--deep-green);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .atmosphere-text {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--charcoal);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .atmosphere-quote {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+            color: var(--deep-green);
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .atmosphere-author {
+            font-size: 0.9rem;
+            color: var(--muted-grey);
+            margin-bottom: 2rem;
+        }
+
+        /* Shadow Animation */
+        .shadow-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .moving-shadow {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(44, 44, 44, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(20px);
+        }
+
+        /* Light Shimmer Animation */
+        .light-shimmer {
+            position: absolute;
+            top: 20%;
+            left: 30%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(184, 160, 130, 0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: shimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Rake Pattern Animation */
+        .rake-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .rake-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(168, 165, 160, 0.3) 50%, transparent 100%);
+            animation: rakeMove 8s ease-in-out infinite;
+        }
+
+        @keyframes rakeMove {
+            0%, 100% { transform: translateX(0); opacity: 0.3; }
+            50% { transform: translateX(20px); opacity: 0.6; }
+        }
+
+        /* Collection Preview */
+        .collection-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+            max-width: 300px;
+        }
+
+        .bottle-preview {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(135deg, rgba(168, 165, 160, 0.3) 0%, rgba(184, 160, 130, 0.3) 100%);
+            border-radius: 2px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .bottle-preview::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 15px;
+            background: rgba(168, 165, 160, 0.5);
+            border-radius: 2px 2px 0 0;
+        }
+
+        .bottle-preview.silence { background: rgba(168, 165, 160, 0.4); }
+        .bottle-preview.shadow { background: rgba(74, 93, 74, 0.4); }
+        .bottle-preview.stillness { background: rgba(184, 160, 130, 0.4); }
+
+        /* Navigation */
+        .nav-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(168, 165, 160, 0.8);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(74, 93, 74, 0.9);
+            transform: scale(1.1);
+        }
+
+        .nav-toggle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 2px;
+            background: var(--off-white);
+            box-shadow: 0 6px 0 var(--off-white), 0 -6px 0 var(--off-white);
+        }
+
+        .nav-menu {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(248, 246, 240, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2px;
+            padding: 1rem 0;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .nav-menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--deep-green);
+            text-decoration: none;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(168, 165, 160, 0.2);
+        }
+
+        .nav-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(184, 160, 130, 0.2);
+            color: var(--charcoal);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .atmosphere-section {
+                padding: 1rem;
+            }
+            
+            .atmosphere-content {
+                padding: 1.5rem;
+            }
+            
+            .collection-preview {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                max-width: 200px;
+            }
+            
+            .bottle-preview {
+                width: 60px;
+                height: 90px;
+            }
+            
+            .nav-toggle {
+                bottom: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .nav-menu {
+                bottom: 5rem;
+                right: 1rem;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        .nav-toggle:focus {
+            outline: 2px solid var(--deep-green);
+            outline-offset: 2px;
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Tatami Corner Section -->
+    <section class="atmosphere-section tatami-corner animate-on-scroll" data-animation="fade-up">
+        <div class="atmosphere-background"></div>
+        <div class="shadow-container">
+            <div class="moving-shadow" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+            <div class="moving-shadow" style="top: 60%; right: 15%; animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="atmosphere-content">
+            <h2 class="atmosphere-title">Tatami Corners</h2>
+            <p class="atmosphere-text">
+                In the quiet corners of traditional tatami rooms, time moves differently. 
+                Natural light filters through shoji screens, creating patterns that shift with the day's rhythm.
+            </p>
+            <div class="atmosphere-quote">
+                "In emptiness, we find fullness. In simplicity, we discover richness."
+            </div>
+            <div class="atmosphere-author">— Japanese Proverb</div>
+        </div>
+    </section>
+
+    <!-- Pottery Fissure Section -->
+    <section class="atmosphere-section pottery-fissure animate-on-scroll" data-animation="fade-up">
+        <div class="atmosphere-background"></div>
+        <div class="light-shimmer"></div>
+        
+        <div class="atmosphere-content">
+            <h2 class="atmosphere-title">Light Finds the Broken Places</h2>
+            <p class="atmosphere-text">
+                In the cracks of weathered pottery, golden light pools and shimmers. 
+                The broken places become sources of unexpected beauty, illuminating what might have been hidden in perfection.
+            </p>
+            <div class="atmosphere-quote">
+                "The wound is the place where the Light enters you."
+            </div>
+            <div class="atmosphere-author">— Rumi</div>
+        </div>
+    </section>
+
+    <!-- Zen Garden Section -->
+    <section class="atmosphere-section zen-garden animate-on-scroll" data-animation="fade-up">
+        <div class="atmosphere-background"></div>
+        <div class="rake-container">
+            <div class="rake-line" style="top: 20%; width: 60%; left: 20%; animation-delay: 0s;"></div>
+            <div class="rake-line" style="top: 40%; width: 50%; left: 25%; animation-delay: 1s;"></div>
+            <div class="rake-line" style="top: 60%; width: 70%; left: 15%; animation-delay: 2s;"></div>
+            <div class="rake-line" style="top: 80%; width: 55%; left: 22%; animation-delay: 3s;"></div>
+        </div>
+        
+        <div class="atmosphere-content">
+            <h2 class="atmosphere-title">Zen Garden</h2>
+            <p class="atmosphere-text">
+                Raked gravel patterns flow like water around solid stones, creating a landscape of pure contemplation. 
+                Each line is drawn with intention, each stone placed with purpose.
+            </p>
+            <div class="atmosphere-quote">
+                "In the garden of simplicity, the mind finds peace."
+            </div>
+            <div class="atmosphere-author">— Zen Teaching</div>
+        </div>
+    </section>
+
+    <!-- Slow Time Section -->
+    <section class="atmosphere-section slow-time animate-on-scroll" data-animation="fade-up">
+        <div class="atmosphere-content">
+            <h2 class="atmosphere-title">Slow Scent for Slower Time</h2>
+            <p class="atmosphere-text">
+                Our fragrances are designed for moments of pause, for the spaces between breaths, 
+                for the quiet contemplation that modern life so often denies us.
+            </p>
+            <div class="atmosphere-quote">
+                "Slow scent for slower time, where each breath becomes a meditation."
+            </div>
+            <div class="atmosphere-author">— Wabi-Sabi Perfumes</div>
+            
+            <div class="collection-preview">
+                <div class="bottle-preview silence">
+                    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--charcoal);">Silence</div>
+                </div>
+                <div class="bottle-preview shadow">
+                    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--charcoal);">Shadow</div>
+                </div>
+                <div class="bottle-preview stillness">
+                    <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; color: var(--charcoal);">Stillness</div>
+                </div>
+            </div>
+            
+            <p class="atmosphere-text">
+                <a href="index.html" style="color: var(--deep-green); text-decoration: none; border-bottom: 1px solid var(--deep-green);">
+                    Experience the fragrances →
+                </a>
+            </p>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <nav class="nav-menu">
+        <a href="index.html">Fragrances</a>
+        <a href="story.html">Story</a>
+        <a href="lifestyle.html">Atmosphere</a>
+    </nav>
+
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+    
+    <script>
+        // Additional lifestyle-specific animations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate moving shadows
+            const shadows = document.querySelectorAll('.moving-shadow');
+            shadows.forEach((shadow, index) => {
+                anime({
+                    targets: shadow,
+                    translateX: [0, 50, -30, 0],
+                    translateY: [0, -20, 10, 0],
+                    scale: [1, 1.1, 0.9, 1],
+                    duration: 12000,
+                    delay: index * 2000,
+                    loop: true,
+                    easing: 'easeInOutSine'
+                });
+            });
+
+            // Animate rake lines
+            const rakeLines = document.querySelectorAll('.rake-line');
+            rakeLines.forEach((line, index) => {
+                anime({
+                    targets: line,
+                    opacity: [0.3, 0.6, 0.3],
+                    translateX: [0, 20, 0],
+                    duration: 8000,
+                    delay: index * 1000,
+                    loop: true,
+                    easing: 'easeInOutSine'
+                });
+            });
+
+            // Animate bottle previews on scroll
+            const bottles = document.querySelectorAll('.bottle-preview');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        anime({
+                            targets: entry.target,
+                            opacity: [0, 1],
+                            translateY: [20, 0],
+                            scale: [0.9, 1],
+                            duration: 800,
+                            easing: 'easeOutQuart'
+                        });
+                    }
+                });
+            });
+
+            bottles.forEach(bottle => {
+                observer.observe(bottle);
+            });
+        });
+    </script>
+</body>
+</html>

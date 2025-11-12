@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wabi-Sabi Perfumes - Beauty in What Vanishes</title>
+    <meta name="description" content="Discover the beauty of imperfection through three contemplative fragrances inspired by Wabi-Sabi philosophy.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --off-white: #F8F6F0;
+            --muted-grey: #A8A5A0;
+            --deep-green: #4A5D4A;
+            --ochre: #B8A082;
+            --warm-beige: #E8E0D0;
+            --charcoal: #2C2C2C;
+            --soft-sage: #7A8B7A;
+            --dusty-rose: #C4A5A0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--off-white);
+            color: var(--charcoal);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .reduced-motion * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--off-white) 0%, var(--warm-beige) 100%);
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('resources/hero-dawn.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.9;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 90%;
+        }
+
+        .hero-headline {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 300;
+            color: var(--charcoal);
+            margin-bottom: 2rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtext {
+            font-size: clamp(1rem, 4vw, 1.25rem);
+            color: var(--muted-grey);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 2s forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--muted-grey);
+            font-size: 0.9rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 3s forwards;
+        }
+
+        /* Smoke Canvas */
+        #smoke-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Fragrance Section */
+        .fragrances-section {
+            padding: 0;
+            background-color: var(--off-white);
+        }
+
+        .fragrance-card {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fragrance-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.8;
+            z-index: 1;
+        }
+
+        .silence-card .card-background {
+            background-image: url('resources/silence-card.jpg');
+        }
+
+        .shadow-card .card-background {
+            background-image: url('resources/shadow-card.jpg');
+        }
+
+        .stillness-card .card-background {
+            background-image: url('resources/stillness-card.jpg');
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 90%;
+            background: rgba(248, 246, 240, 0.9);
+            padding: 2rem;
+            border-radius: 2px;
+            backdrop-filter: blur(10px);
+        }
+
+        .fragrance-name {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(2rem, 6vw, 3rem);
+            font-weight: 400;
+            color: var(--deep-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .fragrance-notes {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: var(--muted-grey);
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+
+        .haiku {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: var(--charcoal);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .haiku.revealed {
+            opacity: 1;
+        }
+
+        .shop-button {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            border: 2px solid var(--deep-green);
+            color: var(--deep-green);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: all 0.4s ease;
+            background: transparent;
+            border-radius: 2px;
+        }
+
+        .shop-button:hover {
+            background-color: var(--ochre);
+            border-color: var(--ochre);
+            color: var(--off-white);
+        }
+
+        /* Steam Effect */
+        .steam-effect {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(168, 165, 160, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Philosophy Section */
+        .philosophy-section {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--warm-beige) 0%, var(--off-white) 100%);
+        }
+
+        .philosophy-text {
+            font-family: 'Noto Serif JP', serif;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            color: var(--deep-green);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+
+        .philosophy-author {
+            font-size: 0.9rem;
+            color: var(--muted-grey);
+            font-style: italic;
+        }
+
+        /* Navigation */
+        .nav-toggle {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(168, 165, 160, 0.8);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(74, 93, 74, 0.9);
+            transform: scale(1.1);
+        }
+
+        .nav-toggle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 2px;
+            background: var(--off-white);
+            box-shadow: 0 6px 0 var(--off-white), 0 -6px 0 var(--off-white);
+        }
+
+        .nav-menu {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(248, 246, 240, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 2px;
+            padding: 1rem 0;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .nav-menu.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--deep-green);
+            text-decoration: none;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(168, 165, 160, 0.2);
+        }
+
+        .nav-menu a:last-child {
+            border-bottom: none;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(184, 160, 130, 0.2);
+            color: var(--charcoal);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .breathing {
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 1rem;
+            }
+            
+            .card-content {
+                padding: 1.5rem;
+            }
+            
+            .nav-toggle {
+                bottom: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .nav-menu {
+                bottom: 5rem;
+                right: 1rem;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for keyboard navigation */
+        .shop-button:focus,
+        .nav-toggle:focus {
+            outline: 2px solid var(--deep-green);
+            outline-offset: 2px;
+        }
+
+        /* Print styles */
+        @media print {
+            .nav-toggle,
+            .nav-menu,
+            #smoke-canvas {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background"></div>
+        <canvas id="smoke-canvas"></canvas>
+        
+        <div class="hero-content">
+            <h1 class="hero-headline">Beauty in what vanishes</h1>
+            <p class="hero-subtext">Discover the profound elegance of impermanence through three contemplative fragrances</p>
+        </div>
+        
+        <div class="scroll-indicator">
+            Scroll to explore
+        </div>
+    </section>
+
+    <!-- Fragrances Section -->
+    <section class="fragrances-section">
+        <!-- Silence -->
+        <div class="fragrance-card silence-card animate-on-scroll" data-animation="fade-up">
+            <div class="card-background"></div>
+            <div class="steam-effect"></div>
+            
+            <div class="card-content">
+                <h2 class="fragrance-name">Silence</h2>
+                <p class="fragrance-notes">White tea, dry sandalwood</p>
+                <div class="haiku">
+                    Steam over cracked clay<br>
+                    breath becomes quiet wisdom<br>
+                    silence holds all sound
+                </div>
+                <a href="#" class="shop-button">Shop Now</a>
+            </div>
+        </div>
+
+        <!-- Shadow -->
+        <div class="fragrance-card shadow-card animate-on-scroll" data-animation="fade-up">
+            <div class="card-background"></div>
+            
+            <div class="card-content">
+                <h2 class="fragrance-name">Shadow</h2>
+                <p class="fragrance-notes">Cool moss, rain-soaked air</p>
+                <div class="haiku">
+                    Dew clings to dark stone<br>
+                    shadows pool in quiet corners<br>
+                    memory of rain
+                </div>
+                <a href="#" class="shop-button">Shop Now</a>
+            </div>
+        </div>
+
+        <!-- Stillness -->
+        <div class="fragrance-card stillness-card animate-on-scroll" data-animation="fade-up">
+            <div class="card-background"></div>
+            
+            <div class="card-content">
+                <h2 class="fragrance-name">Stillness</h2>
+                <p class="fragrance-notes">Warm slate, temple incense</p>
+                <div class="haiku">
+                    Incense whispers upward<br>
+                    stillness settles like warm slate<br>
+                    time moves without haste
+                </div>
+                <a href="#" class="shop-button">Shop Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy Section -->
+    <section class="philosophy-section animate-on-scroll" data-animation="fade-up">
+        <p class="philosophy-text">
+            "Nothing lasts, nothing is finished, and nothing is perfect. In this imperfection lies the profound beauty of existence."
+        </p>
+        <p class="philosophy-author">— Wabi-Sabi Philosophy</p>
+    </section>
+
+    <!-- Navigation -->
+    <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+    </button>
+    
+    <nav class="nav-menu">
+        <a href="index.html">Fragrances</a>
+        <a href="story.html">Story</a>
+        <a href="lifestyle.html">Atmosphere</a>
+    </nav>
+
+    <!-- JavaScript -->
+    <script src="main.js"></script>
+</body>
+</html>
